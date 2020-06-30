@@ -27,11 +27,6 @@ resource "aws_ecs_service" "service" {
     }
   }
 
-  # Allow external changes to service count without Terraform plan difference
-  lifecycle {
-    ignore_changes = [desired_count]
-  }
-
   propagate_tags = "SERVICE"
   tags           = var.tags
 }
