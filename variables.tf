@@ -78,6 +78,12 @@ variable alb_security_group_ids {
   description = "The ids of all security groups set on the ALB. We require that the tasks can only talk to the ALB"
 }
 
+variable execution_role_arn {
+  type        = string
+  description = "If present, this is the execution role that will be used for the ECS Tasks. If not present, a role will be created"
+  default     = ""
+}
+
 variable deploy_env {
   type        = string
   description = "The environment resources are to be created in. Usually dev, staging, or prod"

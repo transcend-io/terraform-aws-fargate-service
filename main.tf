@@ -31,14 +31,18 @@ resource "aws_ecs_service" "service" {
   tags           = var.tags
 }
 
+locals {
+  role_arn = length(var.execution_role_arn) > 0 ? var.execution_role_arn : aws_iam_role.execution_role[0].arn
+}
+
 resource "aws_ecs_task_definition" "task" {
   family                   = "${var.name}-task"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = var.cpu
   memory                   = var.memory
-  execution_role_arn       = aws_iam_role.execution_role.arn
-  task_role_arn            = aws_iam_role.execution_role.arn
+  execution_role_arn       = local.role_arn
+  task_role_arn            = local.role_arn
   container_definitions    = var.container_definitions
   tags                     = var.tags
 }
