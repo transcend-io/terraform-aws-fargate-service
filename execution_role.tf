@@ -10,6 +10,7 @@ data "aws_iam_policy_document" "ecs_cloudwatch_doc" {
 }
 
 resource "aws_iam_role" "execution_role" {
+  count              = length(var.execution_role_arn) > 0 ? 1 : 0
   name_prefix        = "${var.deploy_env}-ecs-execution-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_cloudwatch_doc.json
 }
@@ -37,7 +38,7 @@ locals {
  * many resources will be created at plan time.
  */
 resource "aws_iam_role_policy_attachment" "ecs_role_policy" {
-  count = var.additional_task_policy_arns_count + 1
-  role  = aws_iam_role.execution_role.name
+  count      = length(var.execution_role_arn) > 0 ? var.additional_task_policy_arns_count + 1 : 0
+  role       = aws_iam_role.execution_role[0].name
   policy_arn = local.policy_arns[count.index]
 }
