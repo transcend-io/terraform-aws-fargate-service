@@ -99,10 +99,10 @@ variable execution_role_arn {
   default     = ""
 }
 
-variable extra_security_groups {
-  type        = list(string)
-  description = "List of Amazon Resource Names of security groups to attach, in addition to the one this module creates"
-  default     = []
+variable security_group_id {
+  type        = string
+  description = "If present, this is the security group to apply to the ECS task. If not present, a security group will be created"
+  default     = ""
 }
 
 variable deploy_env {

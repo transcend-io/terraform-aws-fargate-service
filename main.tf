@@ -1,3 +1,7 @@
+locals {
+  security_group_id = length(var.security_group_id) > 0 ? var.security_group_id : aws_security_group.service_security_group[0].id
+}
+
 resource "aws_ecs_service" "service" {
   name          = var.name
   cluster       = var.cluster_id
@@ -7,10 +11,7 @@ resource "aws_ecs_service" "service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups = concat(
-      [aws_security_group.service_security_group.id],
-      var.extra_security_groups
-    )
+    security_groups  = [local.security_group_id]
     subnets          = var.subnet_ids
     assign_public_ip = false
   }
@@ -62,6 +63,7 @@ resource "aws_ecs_task_definition" "task" {
 }
 
 resource "aws_security_group" "service_security_group" {
+  count       = length(var.security_group_id) == 0 ? 1 : 0
   name        = "${var.name}-ecs-security-group"
   description = "Allows inbound access to an ECS service only through its alb"
   vpc_id      = var.vpc_id
