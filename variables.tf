@@ -83,8 +83,8 @@ variable additional_task_policy_arns_count {
 }
 
 variable health_check_grace_period_seconds {
-  type = number
-  default = 60
+  type        = number
+  default     = 60
   description = "Seconds to ignore failing load balancer health checks on newly instantiated tasks to prevent premature shutdown, up to 2147483647. Only valid for services configured to use load balancers."
 }
 
@@ -96,6 +96,12 @@ variable alb_security_group_ids {
 variable execution_role_arn {
   type        = string
   description = "If present, this is the execution role that will be used for the ECS Tasks. If not present, a role will be created"
+  default     = ""
+}
+
+variable security_group_id {
+  type        = string
+  description = "If present, this is the security group to apply to the ECS task. If not present, a security group will be created"
   default     = ""
 }
 
