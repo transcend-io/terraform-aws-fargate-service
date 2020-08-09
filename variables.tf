@@ -32,6 +32,7 @@ variable load_balancers {
     container_port   = string
   }))
 
+  default     = []
   description = <<EOF
   When using ECS services, the service will ensure that at least
   {@variable desired_count} tasks are running at all times. Because
@@ -41,6 +42,16 @@ variable load_balancers {
   `target_group_arn` is the arn of the target group on that alb that will
   be set to watch over the tasks managed by this service.
   EOF
+}
+
+variable service_registries {
+  description = "Allows you to register this service to a Cloud Map registry"
+  type = list(object({
+    registry_arn   = string
+    container_name = string
+    container_port = string
+  }))
+  default = []
 }
 
 variable tags {
