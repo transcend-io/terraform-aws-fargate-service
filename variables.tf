@@ -77,11 +77,13 @@ variable container_definitions {
 variable additional_task_policy_arns {
   type        = list(string)
   description = "IAM Policy arns to be added to the tasks"
+  default     = []
 }
 
 variable additional_task_policy_arns_count {
   type        = number
   description = "The number of items in var.additional_task_policy_arns. Terraform is not quite smart enough to figure this out on its own."
+  default     = 0
 }
 
 variable alb_security_group_ids {
