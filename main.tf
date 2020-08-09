@@ -16,7 +16,8 @@ resource "aws_ecs_service" "service" {
     type = "ECS"
   }
 
-  health_check_grace_period_seconds = length(var.load_balancers) > 0 ? 60 : 0
+  health_check_grace_period_seconds = var.health_check_grace_period_seconds
+
 
   dynamic "load_balancer" {
     for_each = var.load_balancers

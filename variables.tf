@@ -82,6 +82,12 @@ variable additional_task_policy_arns_count {
   default     = 0
 }
 
+variable health_check_grace_period_seconds {
+  type = number
+  default = 60
+  description = "Seconds to ignore failing load balancer health checks on newly instantiated tasks to prevent premature shutdown, up to 2147483647. Only valid for services configured to use load balancers."
+}
+
 variable alb_security_group_ids {
   type        = list(string)
   description = "The ids of all security groups set on the ALB. We require that the tasks can only talk to the ALB"
