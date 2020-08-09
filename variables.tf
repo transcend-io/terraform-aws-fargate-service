@@ -46,12 +46,8 @@ variable load_balancers {
 
 variable service_registries {
   description = "Allows you to register this service to a Cloud Map registry"
-  type = list(object({
-    registry_arn   = string
-    container_name = string
-    container_port = string
-  }))
-  default = []
+  type        = list(map(string))
+  default     = []
 }
 
 variable tags {
