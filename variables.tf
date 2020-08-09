@@ -83,8 +83,8 @@ variable additional_task_policy_arns_count {
 }
 
 variable health_check_grace_period_seconds {
-  type = number
-  default = 60
+  type        = number
+  default     = 60
   description = "Seconds to ignore failing load balancer health checks on newly instantiated tasks to prevent premature shutdown, up to 2147483647. Only valid for services configured to use load balancers."
 }
 
@@ -100,8 +100,9 @@ variable execution_role_arn {
 }
 
 variable extra_security_groups {
-  type = list(string)
+  type        = list(string)
   description = "List of Amazon Resource Names of security groups to attach, in addition to the one this module creates"
+  default     = []
 }
 
 variable deploy_env {
