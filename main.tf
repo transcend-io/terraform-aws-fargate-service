@@ -31,8 +31,9 @@ resource "aws_ecs_service" "service" {
     for_each = var.service_registries
     content {
       registry_arn   = service_registries.value.registry_arn
-      container_name = service_registries.value.container_name
-      container_port = service_registries.value.container_port
+      container_name = lookup(service_registries.value, "container_name", null)
+      container_port = lookup(service_registries.value, "container_port", null)
+      port           = lookup(service_registries.value, "port", null)
     }
   }
 
