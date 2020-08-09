@@ -99,6 +99,11 @@ variable execution_role_arn {
   default     = ""
 }
 
+variable extra_security_groups {
+  type = list(string)
+  description = "List of Amazon Resource Names of security groups to attach, in addition to the one this module creates"
+}
+
 variable deploy_env {
   type        = string
   description = "The environment resources are to be created in. Usually dev, staging, or prod"

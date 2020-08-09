@@ -7,7 +7,10 @@ resource "aws_ecs_service" "service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups  = [aws_security_group.service_security_group.id]
+    security_groups  = concat(
+      [aws_security_group.service_security_group.id],
+      var.extra_security_groups
+    )
     subnets          = var.subnet_ids
     assign_public_ip = false
   }
