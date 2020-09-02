@@ -12,3 +12,8 @@ output "task_arn" {
   value       = aws_ecs_task_definition.task.arn
   description = "Task family and revision for the latest deployed Task Definition"
 }
+
+output "task_family" {
+  value       = aws_ecs_task_definition.task.family
+  description = "Task family of the ECS Task Definition used by this ECS Service"
+}
