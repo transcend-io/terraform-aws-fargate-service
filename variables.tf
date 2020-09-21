@@ -105,6 +105,12 @@ variable security_group_id {
   default     = ""
 }
 
+variable volumes {
+  type        = list(map(string))
+  description = "List of volumes to make available to containers in this task."
+  default     = []
+}
+
 variable deploy_env {
   type        = string
   description = "The environment resources are to be created in. Usually dev, staging, or prod"

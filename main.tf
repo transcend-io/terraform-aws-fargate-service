@@ -60,6 +60,15 @@ resource "aws_ecs_task_definition" "task" {
   task_role_arn            = local.role_arn
   container_definitions    = var.container_definitions
   tags                     = var.tags
+
+  dynamic "volume" {
+    for_each = var.volumes
+
+    content {
+      name     = volume.value["name"]
+      host_path = lookup(volume.value, "host_path", null)
+    }
+  }
 }
 
 resource "aws_security_group" "service_security_group" {
