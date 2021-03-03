@@ -13,6 +13,7 @@ resource "aws_iam_role" "execution_role" {
   count              = length(var.execution_role_arn) == 0 ? 1 : 0
   name_prefix        = "${var.deploy_env}-ecs-execution-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_cloudwatch_doc.json
+  tags               = var.tags
 }
 
 locals {
