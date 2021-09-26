@@ -121,3 +121,19 @@ variable aws_region {
   description = "The AWS region to create resources in."
   default     = "eu-west-1"
 }
+
+variable capacity_provider_strategies {
+  type = list(object({
+    base = optional(number)
+    capacity_provider = string
+    weight = number
+  }))
+  default = []
+  description = <<EOF
+  Capacity provider strategy to use for the service
+
+  base - Number of tasks, at a minimum, to run on the specified capacity provider. Only one capacity provider in a capacity provider strategy can have a base defined.
+  capacity_provider - Short name of the capacity provider
+  weight - Relative percentage of the total number of launched tasks that should use the specified capacity provider
+  EOF
+}

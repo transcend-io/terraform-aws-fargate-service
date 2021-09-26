@@ -22,6 +22,14 @@ resource "aws_ecs_service" "service" {
 
   health_check_grace_period_seconds = var.health_check_grace_period_seconds
 
+  dynamic "capacity_provider_strategy" {
+    for_each = var.capacity_provider_strategies
+    content {
+      base = capacity_provider_strategy.value.base
+      capacity_provider = capacity_provider_strategy.value.capacity_provider
+      weight = capacity_provider_strategy.value.weight
+    }
+  }
 
   dynamic "load_balancer" {
     for_each = var.load_balancers
