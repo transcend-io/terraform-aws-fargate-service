@@ -77,6 +77,10 @@ resource "aws_ecs_task_definition" "task" {
       host_path = lookup(volume.value, "host_path", null)
     }
   }
+
+  ephemeral_storage {
+    size_in_gib = var.ephemeral_storage
+  }
 }
 
 resource "aws_security_group" "service_security_group" {
