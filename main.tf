@@ -62,7 +62,7 @@ resource "aws_security_group" "service_security_group" {
 
 # Service, with no Auto-scaling configured.
 resource "aws_ecs_service" "service_no_autoscaling" {
-  for_each = var.use_autoscaling ? [] : [1]
+  count = var.use_autoscaling ? 0 : 1
 
   name          = var.name
   cluster       = var.cluster_id
@@ -118,7 +118,7 @@ resource "aws_ecs_service" "service_no_autoscaling" {
 
 # Service wth Auto-scaling configured.
 resource "aws_ecs_service" "service_autoscaling" {
-  for_each = var.use_autoscaling ? [1] : []
+  count = var.use_autoscaling ? 1 : 0
 
   name          = var.name
   cluster       = var.cluster_id
@@ -176,7 +176,7 @@ resource "aws_ecs_service" "service_autoscaling" {
 }
 
 resource "aws_appautoscaling_target" "ecs_service_autoscaling_target" {
-  for_each = var.use_autoscaling ? [1] : []
+  count = var.use_autoscaling ? 1 : 0
 
   min_capacity       = var.min_desired_count
   max_capacity       = var.max_desired_count
@@ -186,7 +186,7 @@ resource "aws_appautoscaling_target" "ecs_service_autoscaling_target" {
 }
 
 resource "aws_appautoscaling_policy" "ecs_service_autoscaling_policy" {
-  for_each = var.use_autoscaling ? [1] : []
+  count = var.use_autoscaling ? 1 : 0
 
   name               = "ecs-fargate-service-autoscaling-policy"
   service_namespace  = aws_appautoscaling_target.ecs_service_autoscaling_target[0].service_namespace
