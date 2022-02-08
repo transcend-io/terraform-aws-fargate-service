@@ -13,7 +13,32 @@ variable cluster_id {
 
 variable desired_count {
   type        = number
-  description = "The number of tasks to keep alive at all times"
+  description = "If not using Application Auto-scaling, the number of tasks to keep alive at all times"
+  default = null
+}
+
+variable use_autoscaling {
+  type = bool
+  description = "Use Application Auto-scaling to scale service"
+  default = false
+}
+
+variable min_desired_count {
+  type = number
+  description = "If using Application auto-scaling, minimum number of tasks to keep alive at all times"
+  default = null
+}
+
+variable max_desired_count {
+  type = number
+  description = "If using Application auto-scaling, maximum number of tasks to keep alive at all times"
+  default = null
+}
+
+variable "scaling_target_value" {
+  type = number
+  description = "If using Application auto-scaling, the target value to hit for the Auto-scaling policy"
+  default = null
 }
 
 variable vpc_id {

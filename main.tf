@@ -2,10 +2,14 @@ locals {
   security_group_id = length(var.security_group_id) > 0 ? var.security_group_id : aws_security_group.service_security_group[0].id
 }
 
+data "aws_ecs_cluster" "cluster" {
+  arn = var.cluster_id
+}
+
 resource "aws_ecs_service" "service" {
   name          = var.name
   cluster       = var.cluster_id
-  desired_count = var.desired_count
+  desired_count = var.use_autoscaling ? null : var.desired_count
 
   task_definition = aws_ecs_task_definition.task.arn
   launch_type     = "FARGATE"
@@ -48,6 +52,10 @@ resource "aws_ecs_service" "service" {
       container_port = lookup(service_registries.value, "container_port", null)
       port           = lookup(service_registries.value, "port", null)
     }
+  }
+
+  lifecycle {
+    ignore_changes = concat([], var.use_autoscaling ? [desired_count] : [])
   }
 
   propagate_tags = "SERVICE"
@@ -113,4 +121,34 @@ resource "aws_security_group" "service_security_group" {
   }
 
   tags = var.tags
+}
+
+
+resource "aws_appautoscaling_target" "ecs_service_autoscaling_target" {
+  for_each = var.use_autoscaling ? [1] : []
+
+  min_capacity = var.min_desired_count
+  max_capacity =  var.max_desired_count
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace = "ecs"
+  resource_id = "service/${data.aws_ecs_cluster.cluster.cluster_name}/${aws_ecs_service.service.name}"
+}
+
+resource "aws_appautoscaling_policy" "ecs_service_autoscaling_policy" {
+  name = "ecs-fargate-service-autoscaling-policy"
+  service_namespace = aws_appautoscaling_target.ecs_service_autoscaling_target.service_namespace
+  scalable_dimension = aws_appautoscaling_target.ecs_service_autoscaling_target.scalable_dimension
+  resource_id = aws_appautoscaling_target.ecs_service_autoscaling_target.resource_id
+  policy_type = "TargetTrackingScaling"
+
+  target_tracking_scaling_policy_configuration {
+    # Seconds
+    scale_in_cooldown = 120
+    # Seconds
+    scale_out_cooldown = 30
+    target_value = var.scaling_target_value
+    predefined_metric_specification {
+      predefined_metric_type = "ALBRequestCountPerTarget"
+    }
+  }
 }
