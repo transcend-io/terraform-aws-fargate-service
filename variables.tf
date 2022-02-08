@@ -12,7 +12,7 @@ variable "cluster_id" {
 }
 
 variable "cluster_name" {
-  type = string
+  type        = string
   description = "The name of the ECS cluster this service will run in."
 }
 
