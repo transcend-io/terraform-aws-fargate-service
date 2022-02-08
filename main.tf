@@ -55,7 +55,7 @@ resource "aws_ecs_service" "service" {
   }
 
   lifecycle {
-    ignore_changes = concat([], var.use_autoscaling ? [desired_count] : [])
+    ignore_changes = var.use_autoscaling ? [desired_count] : []
   }
 
   propagate_tags = "SERVICE"
