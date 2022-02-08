@@ -2,10 +2,6 @@ locals {
   security_group_id = length(var.security_group_id) > 0 ? var.security_group_id : aws_security_group.service_security_group[0].id
 }
 
-data "aws_ecs_cluster" "cluster" {
-  arn = var.cluster_id
-}
-
 resource "aws_ecs_service" "service" {
   name          = var.name
   cluster       = var.cluster_id
@@ -131,7 +127,7 @@ resource "aws_appautoscaling_target" "ecs_service_autoscaling_target" {
   max_capacity       = var.max_desired_count
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
-  resource_id        = "service/${data.aws_ecs_cluster.cluster.cluster_name}/${aws_ecs_service.service.name}"
+  resource_id        = "service/${var.cluster_name}/${aws_ecs_service.service.name}"
 }
 
 resource "aws_appautoscaling_policy" "ecs_service_autoscaling_policy" {

@@ -11,6 +11,11 @@ variable "cluster_id" {
   EOF
 }
 
+variable "cluster_name" {
+  type = string
+  description = "The name of the ECS cluster this service will run in."
+}
+
 variable "desired_count" {
   type        = number
   description = "If not using Application Auto-scaling, the number of tasks to keep alive at all times"
