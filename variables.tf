@@ -11,6 +11,11 @@ variable "cluster_id" {
   EOF
 }
 
+variable "cluster_name" {
+  type        = string
+  description = "The name of the ECS cluster this service will run in."
+}
+
 variable "desired_count" {
   type        = number
   description = "If not using Application Auto-scaling, the number of tasks to keep alive at all times"
@@ -170,7 +175,7 @@ variable "capacity_provider_strategies" {
 }
 
 variable "ephemeral_storage_gib" {
-  description = "The total amount, in GiB, of ephemeral storage to set for the task. The minimum supported value is 20 GiB and the maximum supported value is 200 GiB."
+  description = "The total amount, in GiB, of ephemeral storage to set for the task. The minimum supported value is 21 GiB and the maximum supported value is 200 GiB."
   type        = number
-  default     = 20
+  default     = 21
 }
