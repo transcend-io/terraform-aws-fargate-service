@@ -29,9 +29,9 @@ resource "aws_ecs_service" "service" {
   dynamic "capacity_provider_strategy" {
     for_each = var.capacity_provider_strategies
     content {
-      base = capacity_provider_strategy.value.base
+      base              = capacity_provider_strategy.value.base
       capacity_provider = capacity_provider_strategy.value.capacity_provider
-      weight = capacity_provider_strategy.value.weight
+      weight            = capacity_provider_strategy.value.weight
     }
   }
 
@@ -81,7 +81,7 @@ resource "aws_ecs_task_definition" "task" {
     for_each = var.volumes
 
     content {
-      name     = volume.value["name"]
+      name      = volume.value["name"]
       host_path = lookup(volume.value, "host_path", null)
     }
   }
@@ -127,28 +127,28 @@ resource "aws_security_group" "service_security_group" {
 resource "aws_appautoscaling_target" "ecs_service_autoscaling_target" {
   for_each = var.use_autoscaling ? [1] : []
 
-  min_capacity = var.min_desired_count
-  max_capacity =  var.max_desired_count
+  min_capacity       = var.min_desired_count
+  max_capacity       = var.max_desired_count
   scalable_dimension = "ecs:service:DesiredCount"
-  service_namespace = "ecs"
-  resource_id = "service/${data.aws_ecs_cluster.cluster.cluster_name}/${aws_ecs_service.service.name}"
+  service_namespace  = "ecs"
+  resource_id        = "service/${data.aws_ecs_cluster.cluster.cluster_name}/${aws_ecs_service.service.name}"
 }
 
 resource "aws_appautoscaling_policy" "ecs_service_autoscaling_policy" {
-  name = "ecs-fargate-service-autoscaling-policy"
-  service_namespace = aws_appautoscaling_target.ecs_service_autoscaling_target.service_namespace
+  name               = "ecs-fargate-service-autoscaling-policy"
+  service_namespace  = aws_appautoscaling_target.ecs_service_autoscaling_target.service_namespace
   scalable_dimension = aws_appautoscaling_target.ecs_service_autoscaling_target.scalable_dimension
-  resource_id = aws_appautoscaling_target.ecs_service_autoscaling_target.resource_id
-  policy_type = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_service_autoscaling_target.resource_id
+  policy_type        = "TargetTrackingScaling"
 
   target_tracking_scaling_policy_configuration {
     # Seconds
     scale_in_cooldown = 120
     # Seconds
     scale_out_cooldown = 30
-    target_value = var.scaling_target_value
+    target_value       = var.scaling_target_value
     predefined_metric_specification {
-      predefined_metric_type = "ALBRequestCountPerTarget"
+      predefined_metric_type = var.scaling_metric
     }
   }
 }
