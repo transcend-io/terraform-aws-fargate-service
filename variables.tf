@@ -52,6 +52,12 @@ variable "scaling_metric" {
   default     = "ALBRequestCountPerTarget"
 }
 
+variable "alb_scaling_target_resource_id" {
+  type        = string
+  description = "If using Application auto-scaling, and ALBRequestCountPerTarget as the scaling metric, use this resource ID as the measure"
+  default     = ""
+}
+
 variable "vpc_id" {
   description = "ID of the VPC the alb is in"
 }

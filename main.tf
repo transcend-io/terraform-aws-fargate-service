@@ -115,7 +115,6 @@ resource "aws_ecs_service" "service_no_autoscaling" {
   tags           = var.tags
 }
 
-
 # Service wth Auto-scaling configured.
 resource "aws_ecs_service" "service_autoscaling" {
   count = var.use_autoscaling ? 1 : 0
@@ -202,6 +201,7 @@ resource "aws_appautoscaling_policy" "ecs_service_autoscaling_policy" {
     target_value       = var.scaling_target_value
     predefined_metric_specification {
       predefined_metric_type = var.scaling_metric
+      resource_label         = var.scaling_metric == "ALBRequestCountPerTarget" ? var.alb_scaling_target_resource_id : null
     }
   }
 }
