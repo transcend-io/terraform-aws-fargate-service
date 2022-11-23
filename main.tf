@@ -71,6 +71,8 @@ resource "aws_ecs_service" "service_no_autoscaling" {
   task_definition = aws_ecs_task_definition.task.arn
   launch_type     = "FARGATE"
 
+  enable_execute_command = var.enable_execute_command
+
   network_configuration {
     security_groups  = [local.security_group_id]
     subnets          = var.subnet_ids
@@ -125,6 +127,8 @@ resource "aws_ecs_service" "service_autoscaling" {
 
   task_definition = aws_ecs_task_definition.task.arn
   launch_type     = "FARGATE"
+
+  enable_execute_command = var.enable_execute_command
 
   network_configuration {
     security_groups  = [local.security_group_id]

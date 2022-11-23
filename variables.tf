@@ -185,3 +185,9 @@ variable "ephemeral_storage_gib" {
   type        = number
   default     = 21
 }
+
+variable "enable_execute_command" {
+  description = "Specifies whether to enable Amazon ECS Exec for the tasks within the service."
+  type        = bool
+  default     = false
+}
