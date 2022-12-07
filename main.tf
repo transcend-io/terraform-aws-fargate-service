@@ -18,8 +18,25 @@ resource "aws_ecs_task_definition" "task" {
     for_each = var.volumes
 
     content {
-      name      = volume.value["name"]
+      name      = volume.value.name
       host_path = lookup(volume.value, "host_path", null)
+
+      dynamic "efs_volume_configuration" {
+        for_each = lookup(volume.value, "efs_volume_configuration", [])
+        content {
+          file_system_id     = lookup(efs_volume_configuration.value, "file_system_id", null)
+          root_directory     = lookup(efs_volume_configuration.value, "root_directory", null)
+          transit_encryption = lookup(efs_volume_configuration.value, "transit_encryption", null)
+
+          dynamic "authorization_config" {
+            for_each = lookup(efs_volume_configuration.value, "authorization_config", [])
+            content {
+              iam             = lookup(authorization_config.value, "iam", null)
+              access_point_id = lookup(authorization_config.value, "access_point_id", null)
+            }
+          }
+        }
+      }
     }
   }
 

@@ -148,7 +148,7 @@ variable "security_group_id" {
 }
 
 variable "volumes" {
-  type        = list(map(string))
+  type        = list(any)
   description = "List of volumes to make available to containers in this task."
   default     = []
 }
