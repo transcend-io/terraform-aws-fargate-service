@@ -46,6 +46,16 @@ variable "scaling_target_value" {
   default     = null
 }
 
+variable "scale_in_cooldown" {
+  type        = number
+  default     = 120
+}
+
+variable "scale_out_cooldown" {
+  type        = number
+  default     = 30
+}
+
 variable "scaling_metric" {
   type        = string
   description = "If using Application auto-scaling, the pre-defined AWS metric to use for the Auto-scaling policy"

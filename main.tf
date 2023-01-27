@@ -217,9 +217,9 @@ resource "aws_appautoscaling_policy" "ecs_service_autoscaling_policy" {
 
   target_tracking_scaling_policy_configuration {
     # Seconds
-    scale_in_cooldown = 120
+    scale_in_cooldown = var.scale_in_cooldown
     # Seconds
-    scale_out_cooldown = 30
+    scale_out_cooldown = var.scale_out_cooldown
     target_value       = var.scaling_target_value
     predefined_metric_specification {
       predefined_metric_type = var.scaling_metric
