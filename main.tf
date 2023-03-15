@@ -40,6 +40,7 @@ resource "aws_security_group" "service_security_group" {
       from_port       = ingress.value.container_port
       to_port         = ingress.value.container_port
       security_groups = var.alb_security_group_ids
+      cidr_blocks     = var.ingress_cidr_blocks
       protocol        = "tcp"
     }
   }
