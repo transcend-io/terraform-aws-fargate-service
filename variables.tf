@@ -132,7 +132,14 @@ variable "health_check_grace_period_seconds" {
 
 variable "alb_security_group_ids" {
   type        = list(string)
-  description = "The ids of all security groups set on the ALB. We require that the tasks can only talk to the ALB"
+  description = "The ids of all security groups set on the ALB. We require that the tasks can only talk to the ALB. If using an NLB, use ingress_cidr_blocks instead"
+  default     = null
+}
+
+variable "ingress_cidr_blocks" {
+  type        = list(string)
+  description = "CIDR blocks to allow accessing the ECS tasks. This is usually not specified, as the alb_security_group_ids covers the ingress, but in some cases is useful if using an NLB instead of an ALB, which cannot attach security groups to itself."
+  default     = null
 }
 
 variable "execution_role_arn" {
