@@ -72,6 +72,8 @@ variable "load_balancers" {
     target_group_arn = string
     container_name   = string
     container_port   = string
+    security_groups  = optional(list(string))
+    cidr_blocks      = optional(list(string))
   }))
 
   default     = []
