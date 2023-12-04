@@ -3,6 +3,12 @@ locals {
   role_arn          = length(var.execution_role_arn) > 0 ? var.execution_role_arn : aws_iam_role.execution_role[0].arn
 }
 
+resource "null_resource" "always_run" {
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
+}
+
 resource "aws_ecs_task_definition" "task" {
   family                   = "${var.name}-task"
   requires_compatibilities = ["FARGATE"]
@@ -44,6 +50,14 @@ resource "aws_ecs_task_definition" "task" {
   ephemeral_storage {
     size_in_gib = var.ephemeral_storage_gib
   }
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.always_run
+    ]
+  }
+
+  depends_on = [null_resource.always_run]
 }
 
 resource "aws_security_group" "service_security_group" {
