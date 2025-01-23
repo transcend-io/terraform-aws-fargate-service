@@ -17,3 +17,8 @@ output "task_family" {
   value       = aws_ecs_task_definition.task.family
   description = "Task family of the ECS Task Definition used by this ECS Service"
 }
+
+output "service_sg_id" {
+  value       = local.security_group_id
+  description = "ID of the security group set on this ECS Service"
+}
