@@ -16,6 +16,30 @@ resource "aws_iam_role" "execution_role" {
   tags               = var.tags
 }
 
+resource "aws_iam_role_policy" "ecs_instance_role_policy" {
+  name   = "${var.name}-ecs-instance-role-policy"
+  role   = aws_iam_role.execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:PutLogEvents",
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 locals {
   policy_arns = concat(
     var.additional_task_policy_arns,
