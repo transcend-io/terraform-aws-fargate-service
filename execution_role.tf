@@ -17,8 +17,9 @@ resource "aws_iam_role" "execution_role" {
 }
 
 resource "aws_iam_role_policy" "ecs_instance_role_policy" {
+  count  = length(var.execution_role_arn) == 0 ? 1 : 0
   name   = "${var.name}-ecs-instance-role-policy"
-  role   = aws_iam_role.execution_role.id
+  role   = aws_iam_role.execution_role[0].name
 
   policy = jsonencode({
     Version = "2012-10-17"
