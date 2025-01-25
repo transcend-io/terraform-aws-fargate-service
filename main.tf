@@ -80,6 +80,11 @@ resource "aws_ecs_service" "service_no_autoscaling" {
     assign_public_ip = false
   }
 
+  service_connect_configuration {
+    enabled   = var.service_connect_namespace != null
+    namespace = var.service_connect_namespace
+  }
+
   deployment_controller {
     type = "ECS"
   }

@@ -16,6 +16,12 @@ variable "cluster_name" {
   description = "The name of the ECS cluster this service will run in."
 }
 
+variable "service_connect_namespace" {
+  type        = string
+  description = "If using a service connect namespace, the name of the namespace to use"
+  default     = null
+}
+
 variable "desired_count" {
   type        = number
   description = "If not using Application Auto-scaling, the number of tasks to keep alive at all times"
