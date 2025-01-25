@@ -3,6 +3,12 @@ locals {
   role_arn          = length(var.execution_role_arn) > 0 ? var.execution_role_arn : aws_iam_role.execution_role[0].arn
 }
 
+resource "null_resource" "always_run" {
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
+}
+
 resource "aws_ecs_task_definition" "task" {
   family                   = "${var.name}-task"
   requires_compatibilities = ["FARGATE"]
@@ -18,14 +24,40 @@ resource "aws_ecs_task_definition" "task" {
     for_each = var.volumes
 
     content {
-      name      = volume.value["name"]
+      name      = volume.value.name
       host_path = lookup(volume.value, "host_path", null)
+
+      dynamic "efs_volume_configuration" {
+        for_each = lookup(volume.value, "efs_volume_configuration", [])
+        content {
+          file_system_id          = lookup(efs_volume_configuration.value, "file_system_id", null)
+          root_directory          = lookup(efs_volume_configuration.value, "root_directory", null)
+          transit_encryption      = lookup(efs_volume_configuration.value, "transit_encryption", null)
+          transit_encryption_port = lookup(efs_volume_configuration.value, "transit_encryption_port", null)
+
+          dynamic "authorization_config" {
+            for_each = lookup(efs_volume_configuration.value, "authorization_config", [])
+            content {
+              iam             = lookup(authorization_config.value, "iam", null)
+              access_point_id = lookup(authorization_config.value, "access_point_id", null)
+            }
+          }
+        }
+      }
     }
   }
 
   ephemeral_storage {
     size_in_gib = var.ephemeral_storage_gib
   }
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.always_run
+    ]
+  }
+
+  depends_on = [null_resource.always_run]
 }
 
 resource "aws_security_group" "service_security_group" {
@@ -205,9 +237,9 @@ resource "aws_appautoscaling_policy" "ecs_service_autoscaling_policy" {
 
   target_tracking_scaling_policy_configuration {
     # Seconds
-    scale_in_cooldown = 120
+    scale_in_cooldown = var.scale_in_cooldown
     # Seconds
-    scale_out_cooldown = 30
+    scale_out_cooldown = var.scale_out_cooldown
     target_value       = var.scaling_target_value
     predefined_metric_specification {
       predefined_metric_type = var.scaling_metric
