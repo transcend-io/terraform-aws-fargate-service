@@ -100,6 +100,48 @@ variable "service_registries" {
   default     = []
 }
 
+variable "vpc_lattice_configurations" {
+  type = list(object({
+    target_group_arn = string
+    port_name        = string
+    role_arn         = string
+  }))
+  default     = []
+  description = <<-EOF
+    Optional VPC Lattice attachments for the ECS service. Each entry registers
+    tasks into an IP target group. port_name must match a named portMappings
+    entry on the task definition. role_arn is the ECS infrastructure IAM role
+    for VPC Lattice. Leave empty (default) for no Lattice configuration.
+  EOF
+}
+
+variable "additional_security_group_ids" {
+  type        = list(string)
+  default     = []
+  description = <<-EOF
+    Extra security groups attached to the ECS service network configuration
+    alongside the primary task security group.
+  EOF
+}
+
+variable "additional_ingress_rules" {
+  type = list(object({
+    from_port       = number
+    to_port         = number
+    protocol        = string
+    prefix_list_ids = optional(list(string), [])
+    cidr_blocks     = optional(list(string), [])
+    security_groups = optional(list(string), [])
+    description     = optional(string, null)
+  }))
+  default     = []
+  description = <<-EOF
+    Extra inline ingress rules on the primary task security group. Prefer this
+    for VPC Lattice managed prefix-list allows — do not mix standalone
+    aws_vpc_security_group_ingress_rule resources with this SG's inline ingress.
+  EOF
+}
+
 variable "tags" {
   type        = map(string)
   description = "Tags to set on all resources that support them"

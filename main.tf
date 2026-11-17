@@ -1,6 +1,8 @@
 locals {
   security_group_id = length(var.security_group_id) > 0 ? var.security_group_id : aws_security_group.service_security_group[0].id
   role_arn          = length(var.execution_role_arn) > 0 ? var.execution_role_arn : aws_iam_role.execution_role[0].arn
+  # Primary task SG plus any caller-supplied extras (e.g. Lattice ingress SG).
+  network_security_group_ids = concat([local.security_group_id], var.additional_security_group_ids)
 }
 
 resource "aws_ecs_task_definition" "task" {
@@ -40,8 +42,21 @@ resource "aws_security_group" "service_security_group" {
       from_port       = ingress.value.container_port
       to_port         = ingress.value.container_port
       security_groups = can(length(ingress.value.security_groups)) ? ingress.value.security_groups : var.alb_security_group_ids
-      cidr_blocks = can(length(ingress.value.cidr_blocks)) ? ingress.value.cidr_blocks : var.ingress_cidr_blocks
+      cidr_blocks     = can(length(ingress.value.cidr_blocks)) ? ingress.value.cidr_blocks : var.ingress_cidr_blocks
       protocol        = "tcp"
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = var.additional_ingress_rules
+    content {
+      from_port       = ingress.value.from_port
+      to_port         = ingress.value.to_port
+      protocol        = ingress.value.protocol
+      prefix_list_ids = ingress.value.prefix_list_ids
+      cidr_blocks     = ingress.value.cidr_blocks
+      security_groups = ingress.value.security_groups
+      description     = ingress.value.description
     }
   }
 
@@ -75,7 +90,7 @@ resource "aws_ecs_service" "service_no_autoscaling" {
   enable_execute_command = var.enable_execute_command
 
   network_configuration {
-    security_groups  = [local.security_group_id]
+    security_groups  = local.network_security_group_ids
     subnets          = var.subnet_ids
     assign_public_ip = false
   }
@@ -119,6 +134,15 @@ resource "aws_ecs_service" "service_no_autoscaling" {
     }
   }
 
+  dynamic "vpc_lattice_configurations" {
+    for_each = var.vpc_lattice_configurations
+    content {
+      target_group_arn = vpc_lattice_configurations.value.target_group_arn
+      port_name        = vpc_lattice_configurations.value.port_name
+      role_arn         = vpc_lattice_configurations.value.role_arn
+    }
+  }
+
   propagate_tags = "SERVICE"
   tags           = var.tags
 }
@@ -137,7 +161,7 @@ resource "aws_ecs_service" "service_autoscaling" {
   enable_execute_command = var.enable_execute_command
 
   network_configuration {
-    security_groups  = [local.security_group_id]
+    security_groups  = local.network_security_group_ids
     subnets          = var.subnet_ids
     assign_public_ip = false
   }
@@ -173,6 +197,15 @@ resource "aws_ecs_service" "service_autoscaling" {
       container_name = lookup(service_registries.value, "container_name", null)
       container_port = lookup(service_registries.value, "container_port", null)
       port           = lookup(service_registries.value, "port", null)
+    }
+  }
+
+  dynamic "vpc_lattice_configurations" {
+    for_each = var.vpc_lattice_configurations
+    content {
+      target_group_arn = vpc_lattice_configurations.value.target_group_arn
+      port_name        = vpc_lattice_configurations.value.port_name
+      role_arn         = vpc_lattice_configurations.value.role_arn
     }
   }
 
