@@ -1,6 +1,8 @@
 locals {
   security_group_id = length(var.security_group_id) > 0 ? var.security_group_id : aws_security_group.service_security_group[0].id
   role_arn          = length(var.execution_role_arn) > 0 ? var.execution_role_arn : aws_iam_role.execution_role[0].arn
+  # Primary task SG plus any caller-supplied extras (e.g. Lattice ingress SG).
+  network_security_group_ids = concat([local.security_group_id], var.additional_security_group_ids)
 }
 
 resource "aws_ecs_task_definition" "task" {
@@ -75,7 +77,7 @@ resource "aws_ecs_service" "service_no_autoscaling" {
   enable_execute_command = var.enable_execute_command
 
   network_configuration {
-    security_groups  = [local.security_group_id]
+    security_groups  = local.network_security_group_ids
     subnets          = var.subnet_ids
     assign_public_ip = false
   }
@@ -146,7 +148,7 @@ resource "aws_ecs_service" "service_autoscaling" {
   enable_execute_command = var.enable_execute_command
 
   network_configuration {
-    security_groups  = [local.security_group_id]
+    security_groups  = local.network_security_group_ids
     subnets          = var.subnet_ids
     assign_public_ip = false
   }

@@ -115,6 +115,17 @@ variable "vpc_lattice_configurations" {
   EOF
 }
 
+variable "additional_security_group_ids" {
+  type        = list(string)
+  default     = []
+  description = <<-EOF
+    Extra security groups attached to the ECS service network configuration
+    alongside the primary task security group. Use this for rules that must not
+    live as inline ingress on the primary SG (for example VPC Lattice prefix-list
+    ingress managed via aws_vpc_security_group_ingress_rule).
+  EOF
+}
+
 variable "tags" {
   type        = map(string)
   description = "Tags to set on all resources that support them"
