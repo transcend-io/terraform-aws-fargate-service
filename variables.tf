@@ -120,9 +120,25 @@ variable "additional_security_group_ids" {
   default     = []
   description = <<-EOF
     Extra security groups attached to the ECS service network configuration
-    alongside the primary task security group. Use this for rules that must not
-    live as inline ingress on the primary SG (for example VPC Lattice prefix-list
-    ingress managed via aws_vpc_security_group_ingress_rule).
+    alongside the primary task security group.
+  EOF
+}
+
+variable "additional_ingress_rules" {
+  type = list(object({
+    from_port       = number
+    to_port         = number
+    protocol        = string
+    prefix_list_ids = optional(list(string), [])
+    cidr_blocks     = optional(list(string), [])
+    security_groups = optional(list(string), [])
+    description     = optional(string, null)
+  }))
+  default     = []
+  description = <<-EOF
+    Extra inline ingress rules on the primary task security group. Prefer this
+    for VPC Lattice managed prefix-list allows — do not mix standalone
+    aws_vpc_security_group_ingress_rule resources with this SG's inline ingress.
   EOF
 }
 

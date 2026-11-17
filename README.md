@@ -11,7 +11,7 @@ ECS can register task ENI IP addresses with a VPC Lattice **IP** target group wh
 - **Default:** `vpc_lattice_configurations = []` — no Lattice blocks are created (no behavior change vs prior releases).
 - **`port_name`:** Must match a **named** `portMappings` entry in the task definition (`container_definitions` JSON).
 - **`role_arn`:** The [ECS infrastructure IAM role for VPC Lattice](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/infrastructure_IAM_role.html). Callers create and pass this role; this module does not create Lattice resources or IAM.
-- **`additional_security_group_ids`:** Optional extra SGs on the service (for example a dedicated SG that allows the VPC Lattice managed prefix list). Do not add standalone ingress rules onto the primary task SG: it uses inline `ingress` blocks, which conflict with `aws_vpc_security_group_ingress_rule`.
+- **`additional_ingress_rules`:** Optional inline ingress on the primary task SG (for example VPC Lattice managed prefix-list → task port). Prefer this over a second SG or standalone `aws_vpc_security_group_ingress_rule` on the primary SG (inline + standalone conflict).
 
 Example (values are illustrative):
 
