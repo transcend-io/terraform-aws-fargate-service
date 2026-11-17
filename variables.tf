@@ -100,6 +100,21 @@ variable "service_registries" {
   default     = []
 }
 
+variable "vpc_lattice_configurations" {
+  type = list(object({
+    target_group_arn = string
+    port_name        = string
+    role_arn         = string
+  }))
+  default     = []
+  description = <<-EOF
+    Optional VPC Lattice attachments for the ECS service. Each entry registers
+    tasks into an IP target group. port_name must match a named portMappings
+    entry on the task definition. role_arn is the ECS infrastructure IAM role
+    for VPC Lattice. Leave empty (default) for no Lattice configuration.
+  EOF
+}
+
 variable "tags" {
   type        = map(string)
   description = "Tags to set on all resources that support them"

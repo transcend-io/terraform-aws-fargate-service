@@ -40,7 +40,7 @@ resource "aws_security_group" "service_security_group" {
       from_port       = ingress.value.container_port
       to_port         = ingress.value.container_port
       security_groups = can(length(ingress.value.security_groups)) ? ingress.value.security_groups : var.alb_security_group_ids
-      cidr_blocks = can(length(ingress.value.cidr_blocks)) ? ingress.value.cidr_blocks : var.ingress_cidr_blocks
+      cidr_blocks     = can(length(ingress.value.cidr_blocks)) ? ingress.value.cidr_blocks : var.ingress_cidr_blocks
       protocol        = "tcp"
     }
   }
@@ -119,6 +119,15 @@ resource "aws_ecs_service" "service_no_autoscaling" {
     }
   }
 
+  dynamic "vpc_lattice_configurations" {
+    for_each = var.vpc_lattice_configurations
+    content {
+      target_group_arn = vpc_lattice_configurations.value.target_group_arn
+      port_name        = vpc_lattice_configurations.value.port_name
+      role_arn         = vpc_lattice_configurations.value.role_arn
+    }
+  }
+
   propagate_tags = "SERVICE"
   tags           = var.tags
 }
@@ -173,6 +182,15 @@ resource "aws_ecs_service" "service_autoscaling" {
       container_name = lookup(service_registries.value, "container_name", null)
       container_port = lookup(service_registries.value, "container_port", null)
       port           = lookup(service_registries.value, "port", null)
+    }
+  }
+
+  dynamic "vpc_lattice_configurations" {
+    for_each = var.vpc_lattice_configurations
+    content {
+      target_group_arn = vpc_lattice_configurations.value.target_group_arn
+      port_name        = vpc_lattice_configurations.value.port_name
+      role_arn         = vpc_lattice_configurations.value.role_arn
     }
   }
 
